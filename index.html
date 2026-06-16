@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Left</title>
-    <script src="lib/pdf.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -102,16 +101,6 @@
             width: 0%;
         }
 
-        .pdf-loading {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: rgba(255,255,255,0.25);
-            font-family: sans-serif;
-            font-size: 1.1em;
-        }
     </style>
 </head>
 <body>
@@ -152,104 +141,48 @@
     // Video:  { src: 'media/clip.mp4' }   ← plays to end, then advances
     // ================================================================
     const SLIDES = [
-        { src: 'media/Poster Migal-Gili Nachmani.pdf' },
-        { src: 'media/Poster for IMTF2022_Loai Basheer_Final.pdf' },
+        { src: 'media/Poster Migal-Gili Nachmani.jpg' },
+        { src: 'media/Poster for IMTF2022_Loai Basheer_Final.jpg' },
         { src: 'media/WhatsApp Video 2026-06-15 at 11.15.57.mp4' },
-        { src: 'media/Poster_Or Tagar_May2025.pdf' },
-        { src: 'media/Poster_FOP-2021_Sandip.pdf' },
+        { src: 'media/Poster_Or Tagar_May2025.jpg' },
+        { src: 'media/Poster_FOP-2021_Sandip.jpg' },
         { src: 'media/WhatsApp Video 2026-06-15 at 11.13.30.mp4' },
-        { src: 'media/poster Pangboern 2019 - ofir benjamin.pdf' },
+        { src: 'media/poster Pangboern 2019 - ofir benjamin.jpg' },
     ];
 
     // ================================================================
     // ENGINE
     // ================================================================
-    // Disable Worker for maximum signage browser compatibility
-    pdfjsLib.GlobalWorkerOptions.workerSrc = '';
-
     const slidesArea = document.getElementById('slides-area');
     const progress   = document.getElementById('progress');
 
-    function fileType(src) {
-        if (/\.(mp4|webm|ogg|mov)$/i.test(src)) return 'video';
-        if (/\.pdf$/i.test(src))                 return 'pdf';
-        return 'image';
-    }
+    function isVideo(src) { return /\.(mp4|webm|ogg|mov)$/i.test(src); }
 
     const list = CONFIG.shuffle ? [...SLIDES].sort(() => Math.random() - 0.5) : SLIDES;
     const slideEls = [];
     let current = 0;
     let timer   = null;
 
-    // Tracks in-progress renders so multiple callers share the same Promise
-    const renderPromises = new Map();
-
-    function renderPDF(src, container) {
-        if (renderPromises.has(container)) return renderPromises.get(container);
-
-        const p = (async () => {
-            const loadingEl = container.querySelector('.pdf-loading');
-            try {
-                const pdf  = await pdfjsLib.getDocument(src).promise;
-                const page = await pdf.getPage(1);
-
-                const baseVP = page.getViewport({ scale: 1 });
-                const W = slidesArea.offsetWidth  || window.innerHeight;
-                const H = slidesArea.offsetHeight || window.innerWidth;
-                const scale = Math.min(W / baseVP.width, H / baseVP.height) * (window.devicePixelRatio || 1);
-
-                const viewport = page.getViewport({ scale });
-                const canvas   = document.createElement('canvas');
-                canvas.width   = viewport.width;
-                canvas.height  = viewport.height;
-                canvas.style.width     = '100%';
-                canvas.style.height    = '100%';
-                canvas.style.objectFit = 'contain';
-
-                await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
-
-                if (loadingEl) loadingEl.remove();
-                container.appendChild(canvas);
-            } catch (e) {
-                console.error('PDF render failed:', e);
-                // Skip to next slide on error instead of getting stuck
-                if (loadingEl) loadingEl.remove();
-                next();
-            }
-        })();
-
-        renderPromises.set(container, p);
-        return p;
-    }
-
     function buildSlides() {
         list.forEach((slide, i) => {
-            const div  = document.createElement('div');
+            const div = document.createElement('div');
             div.className = 'slide';
-            const type = fileType(slide.src);
-            div.dataset.type     = type;
-            div.dataset.duration = slide.duration ?? CONFIG.defaultImageDuration;
 
-            if (type === 'video') {
+            if (isVideo(slide.src)) {
                 const vid = document.createElement('video');
                 vid.src         = slide.src;
                 vid.muted       = true;
                 vid.playsInline = true;
                 vid.preload     = 'metadata';
+                div.dataset.type = 'video';
                 div.appendChild(vid);
-
-            } else if (type === 'pdf') {
-                const loader = document.createElement('div');
-                loader.className   = 'pdf-loading';
-                loader.textContent = 'Loading…';
-                div.appendChild(loader);
-                if (i < 2) renderPDF(slide.src, div);
-
             } else {
                 const img   = document.createElement('img');
                 img.src     = slide.src;
                 img.alt     = '';
                 img.loading = i === 0 ? 'eager' : 'lazy';
+                div.dataset.type     = 'image';
+                div.dataset.duration = slide.duration ?? CONFIG.defaultImageDuration;
                 div.appendChild(img);
             }
 
@@ -272,19 +205,7 @@
 
         current = ((index % slideEls.length) + slideEls.length) % slideEls.length;
         const el = slideEls[current];
-
-        if (el.dataset.type === 'pdf' && !el.querySelector('canvas')) {
-            renderPDF(list[current].src, el).then(() => el.classList.add('active'));
-        } else {
-            el.classList.add('active');
-        }
-
-        // Pre-render next PDF
-        const nextIdx = (current + 1) % slideEls.length;
-        const nextEl  = slideEls[nextIdx];
-        if (nextEl.dataset.type === 'pdf' && !nextEl.querySelector('canvas')) {
-            renderPDF(list[nextIdx].src, nextEl);
-        }
+        el.classList.add('active');
 
         if (el.dataset.type === 'video') {
             const vid = el.querySelector('video');
