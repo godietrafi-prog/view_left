@@ -180,35 +180,43 @@
     let current = 0;
     let timer   = null;
 
-    async function renderPDF(src, container) {
-        if (container.dataset.rendering || container.querySelector('canvas')) return;
-        container.dataset.rendering = '1';
-        const loadingEl = container.querySelector('.pdf-loading');
-        try {
-            const pdf  = await pdfjsLib.getDocument(src).promise;
-            const page = await pdf.getPage(1);
+    // Tracks in-progress renders so multiple callers share the same Promise
+    const renderPromises = new Map();
 
-            const baseVP = page.getViewport({ scale: 1 });
-            const W = container.offsetWidth  || slidesArea.offsetWidth  || window.innerHeight;
-            const H = container.offsetHeight || slidesArea.offsetHeight || window.innerWidth;
-            const scale = Math.min(W / baseVP.width, H / baseVP.height) * (window.devicePixelRatio || 1);
+    function renderPDF(src, container) {
+        if (renderPromises.has(container)) return renderPromises.get(container);
 
-            const viewport = page.getViewport({ scale });
-            const canvas   = document.createElement('canvas');
-            canvas.width   = viewport.width;
-            canvas.height  = viewport.height;
-            canvas.style.width  = '100%';
-            canvas.style.height = '100%';
-            canvas.style.objectFit = 'contain';
+        const p = (async () => {
+            const loadingEl = container.querySelector('.pdf-loading');
+            try {
+                const pdf  = await pdfjsLib.getDocument(src).promise;
+                const page = await pdf.getPage(1);
 
-            await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+                const baseVP = page.getViewport({ scale: 1 });
+                const W = slidesArea.offsetWidth  || window.innerHeight;
+                const H = slidesArea.offsetHeight || window.innerWidth;
+                const scale = Math.min(W / baseVP.width, H / baseVP.height) * (window.devicePixelRatio || 1);
 
-            if (loadingEl) loadingEl.remove();
-            container.appendChild(canvas);
-        } catch (e) {
-            if (loadingEl) loadingEl.textContent = 'Error loading PDF';
-            console.error(e);
-        }
+                const viewport = page.getViewport({ scale });
+                const canvas   = document.createElement('canvas');
+                canvas.width   = viewport.width;
+                canvas.height  = viewport.height;
+                canvas.style.width     = '100%';
+                canvas.style.height    = '100%';
+                canvas.style.objectFit = 'contain';
+
+                await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+
+                if (loadingEl) loadingEl.remove();
+                container.appendChild(canvas);
+            } catch (e) {
+                if (loadingEl) loadingEl.textContent = 'Error loading PDF';
+                console.error(e);
+            }
+        })();
+
+        renderPromises.set(container, p);
+        return p;
     }
 
     function buildSlides() {
