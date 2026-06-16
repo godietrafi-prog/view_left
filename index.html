@@ -14,10 +14,6 @@
             overflow: hidden;
         }
 
-        /*
-         * Screen rotated 270° (right side down).
-         * Stage is width=100vh × height=100vw, then rotated to fill the physical screen.
-         */
         #stage {
             position: fixed;
             top: 50%;
@@ -60,7 +56,10 @@
 
         .slide {
             position: absolute;
-            inset: 0;
+            top: 6px;   /* small gap below the green bar */
+            left: 0;
+            right: 0;
+            bottom: 0;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -69,7 +68,14 @@
         }
         .slide.active { opacity: 1; }
 
-        .slide img, .slide video, .slide canvas {
+        .slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+        }
+
+        /* Videos: default style; JS may override for landscape-stored files */
+        .slide video {
             width: 100%;
             height: 100%;
             object-fit: fill;
@@ -90,17 +96,6 @@
             width: auto;
             object-fit: contain;
         }
-
-        /* Progress bar sits inside the green top bar */
-        #progress {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            height: 3px;
-            background: rgba(255,255,255,0.6);
-            width: 0%;
-        }
-
     </style>
 </head>
 <body>
@@ -113,9 +108,7 @@
             <div class="dot"></div>
         </div>
 
-        <div id="slides-area">
-            <div id="progress"></div>
-        </div>
+        <div id="slides-area"></div>
 
         <div id="bottom-bar">
             <img id="logo" src="Logo_official_eng.png" alt="Tel-Hai">
@@ -126,21 +119,19 @@
     // ================================================================
     // CONFIGURATION
     // ================================================================
-    const CONFIG = {
-        defaultImageDuration: 10,   // seconds each image/PDF is shown
+    var CONFIG = {
+        defaultImageDuration: 10,
         loop:    true,
         shuffle: false,
     };
 
     // ================================================================
     // SLIDES LIST
-    //
-    // Image:  { src: 'media/poster.jpg' }
-    // PDF:    { src: 'media/poster.pdf' }
-    //         { src: 'media/poster.pdf', duration: 15 }   ← custom seconds
-    // Video:  { src: 'media/clip.mp4' }   ← plays to end, then advances
+    // Image: { src: 'media/poster.jpg' }
+    //        { src: 'media/poster.jpg', duration: 15 }
+    // Video: { src: 'media/clip.mp4' }  ← plays to end then advances
     // ================================================================
-    const SLIDES = [
+    var SLIDES = [
         { src: 'media/Poster Migal-Gili Nachmani.jpg' },
         { src: 'media/Poster for IMTF2022_Loai Basheer_Final.jpg' },
         { src: 'media/WhatsApp Video 2026-06-15 at 11.15.57.mp4' },
@@ -153,80 +144,89 @@
     // ================================================================
     // ENGINE
     // ================================================================
-    const slidesArea = document.getElementById('slides-area');
-    const progress   = document.getElementById('progress');
+    var slidesArea = document.getElementById('slides-area');
+    var slideEls   = [];
+    var current    = 0;
+    var timer      = null;
 
     function isVideo(src) { return /\.(mp4|webm|ogg|mov)$/i.test(src); }
 
-    const list = CONFIG.shuffle ? [...SLIDES].sort(() => Math.random() - 0.5) : SLIDES;
-    const slideEls = [];
-    let current = 0;
-    let timer   = null;
+    var list = CONFIG.shuffle ? SLIDES.slice().sort(function() { return Math.random() - 0.5; }) : SLIDES;
 
     function buildSlides() {
-        list.forEach((slide, i) => {
-            const div = document.createElement('div');
+        for (var i = 0; i < list.length; i++) {
+            var slide = list[i];
+            var div = document.createElement('div');
             div.className = 'slide';
 
             if (isVideo(slide.src)) {
-                const vid = document.createElement('video');
-                vid.src         = slide.src;
-                vid.muted       = true;
-                vid.playsInline = true;
-                vid.preload     = 'metadata';
-                div.dataset.type = 'video';
+                var vid = document.createElement('video');
+                vid.src = slide.src;
+                vid.muted = true;
+                vid.setAttribute('playsinline', '');
+                vid.preload = 'metadata';
+                div.setAttribute('data-type', 'video');
+
+                // Detect landscape-stored video (metadata rotation ignored by signage)
+                // and counter-rotate so it displays correctly
+                (function(v) {
+                    v.addEventListener('loadedmetadata', function() {
+                        if (v.videoWidth > v.videoHeight) {
+                            // Stored landscape, needs 90° correction
+                            v.style.width     = '100%';
+                            v.style.height    = '100%';
+                            v.style.objectFit = 'fill';
+                            v.style.transform = 'rotate(90deg)';
+                        }
+                    });
+                })(vid);
+
                 div.appendChild(vid);
             } else {
-                const img   = document.createElement('img');
-                img.src     = slide.src;
-                img.alt     = '';
+                var img = document.createElement('img');
+                img.src = slide.src;
+                img.alt = '';
                 img.loading = i === 0 ? 'eager' : 'lazy';
-                div.dataset.type     = 'image';
-                div.dataset.duration = (slide.duration != null) ? slide.duration : CONFIG.defaultImageDuration;
+                div.setAttribute('data-type', 'image');
+                var dur = (slide.duration != null) ? slide.duration : CONFIG.defaultImageDuration;
+                div.setAttribute('data-duration', dur);
                 div.appendChild(img);
             }
 
             slidesArea.appendChild(div);
             slideEls.push(div);
-        });
+        }
     }
 
     function showSlide(index) {
         if (!slideEls.length) return;
 
-        slideEls.forEach(el => {
-            el.classList.remove('active');
-            const v = el.querySelector('video');
+        for (var j = 0; j < slideEls.length; j++) {
+            slideEls[j].classList.remove('active');
+            var v = slideEls[j].querySelector('video');
             if (v) { v.pause(); v.onended = null; }
-        });
+        }
         clearTimeout(timer);
-        progress.style.transition = 'none';
-        progress.style.width = '0%';
 
         current = ((index % slideEls.length) + slideEls.length) % slideEls.length;
-        const el = slideEls[current];
+        var el = slideEls[current];
         el.classList.add('active');
 
-        if (el.dataset.type === 'video') {
-            const vid = el.querySelector('video');
+        if (el.getAttribute('data-type') === 'video') {
+            var vid = el.querySelector('video');
             vid.currentTime = 0;
-            vid.play().catch(() => next());
+            vid.play()['catch'](function() { next(); });
             vid.onended = next;
             timer = setTimeout(next, 60000);
         } else {
-            const dur = parseFloat(el.dataset.duration);
-            const img = el.querySelector('img');
-            const startTimer = () => {
-                requestAnimationFrame(() => {
-                    progress.style.transition = `width ${dur}s linear`;
-                    progress.style.width = '100%';
-                });
+            var dur = parseFloat(el.getAttribute('data-duration'));
+            var img = el.querySelector('img');
+            function startTimer() {
                 timer = setTimeout(next, dur * 1000);
-            };
-            // Wait for image to load before starting the countdown
+            }
             if (img && !img.complete) {
                 img.onload  = startTimer;
-                img.onerror = next; // broken image → skip
+                img.onerror = function() { next(); };
             } else {
                 startTimer();
             }
@@ -234,15 +234,19 @@
     }
 
     function next() {
-        const n = (current + 1) % slideEls.length;
+        var n = (current + 1) % slideEls.length;
         if (n === 0 && !CONFIG.loop) return;
         showSlide(n);
     }
 
-    document.addEventListener('keydown', e => {
+    document.addEventListener('keydown', function(e) {
         if (e.key === 'ArrowRight' || e.key === ' ')  next();
-        if (e.key === 'ArrowLeft')                    showSlide(current - 1);
-        if (e.key === 'f' || e.key === 'F') { if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen(); }
+        if (e.key === 'ArrowLeft')  showSlide(current - 1);
+        if (e.key === 'f' || e.key === 'F') {
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            }
+        }
     });
     document.addEventListener('click', next);
 
