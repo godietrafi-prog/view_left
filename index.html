@@ -182,7 +182,7 @@
                 img.alt     = '';
                 img.loading = i === 0 ? 'eager' : 'lazy';
                 div.dataset.type     = 'image';
-                div.dataset.duration = slide.duration ?? CONFIG.defaultImageDuration;
+                div.dataset.duration = (slide.duration != null) ? slide.duration : CONFIG.defaultImageDuration;
                 div.appendChild(img);
             }
 
@@ -242,7 +242,7 @@
     document.addEventListener('keydown', e => {
         if (e.key === 'ArrowRight' || e.key === ' ')  next();
         if (e.key === 'ArrowLeft')                    showSlide(current - 1);
-        if (e.key === 'f' || e.key === 'F')           document.documentElement.requestFullscreen?.();
+        if (e.key === 'f' || e.key === 'F') { if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen(); }
     });
     document.addEventListener('click', next);
 
