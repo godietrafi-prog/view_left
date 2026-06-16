@@ -164,7 +164,8 @@
     // ================================================================
     // ENGINE
     // ================================================================
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'lib/pdf.worker.min.js';
+    // Disable Worker for maximum signage browser compatibility
+    pdfjsLib.GlobalWorkerOptions.workerSrc = '';
 
     const slidesArea = document.getElementById('slides-area');
     const progress   = document.getElementById('progress');
@@ -210,8 +211,10 @@
                 if (loadingEl) loadingEl.remove();
                 container.appendChild(canvas);
             } catch (e) {
-                if (loadingEl) loadingEl.textContent = 'Error loading PDF';
-                console.error(e);
+                console.error('PDF render failed:', e);
+                // Skip to next slide on error instead of getting stuck
+                if (loadingEl) loadingEl.remove();
+                next();
             }
         })();
 
@@ -286,8 +289,9 @@
         if (el.dataset.type === 'video') {
             const vid = el.querySelector('video');
             vid.currentTime = 0;
-            vid.play().catch(() => {});
+            vid.play().catch(() => next()); // autoplay blocked → skip
             vid.onended = next;
+            timer = setTimeout(next, 60000); // safety: max 60s per video
         } else {
             const dur = parseFloat(el.dataset.duration);
             requestAnimationFrame(() => {
