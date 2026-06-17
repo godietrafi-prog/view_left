@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>View Left</title>
+    <title>View Right</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -20,7 +20,7 @@
             left: 50%;
             width: 100vh;
             height: 100vw;
-            transform: translate(-50%, -50%) rotate(270deg);
+            transform: translate(-50%, -50%) rotate(90deg);
             display: flex;
             flex-direction: column;
         }
@@ -120,23 +120,7 @@
     var isSignage = window.location.search.indexOf('signage') > -1;
 
     // ================================================================
-    // SLIDES LIST
-    // Image: { src: 'media/poster.jpg' }
-    //        { src: 'media/poster.jpg', duration: 15 }
-    // Video: { src: 'media/clip.mp4' }
-    // ================================================================
-    var SLIDES = [
-        { src: 'media/Poster Migal-Gili Nachmani.jpg' },
-        { src: 'media/Poster for IMTF2022_Loai Basheer_Final.jpg' },
-        { src: 'media/WhatsApp Video 2026-06-15 at 11.15.57.mp4' },
-        { src: 'media/Poster_Or Tagar_May2025.jpg' },
-        { src: 'media/Poster_FOP-2021_Sandip.jpg' },
-        { src: 'media/WhatsApp Video 2026-06-15 at 11.13.30.mp4' },
-        { src: 'media/poster Pangboern 2019 - ofir benjamin.jpg' },
-    ];
-
-    // ================================================================
-    // ENGINE
+    // ENGINE  (slides loaded from slides.json)
     // ================================================================
     var slidesArea = document.getElementById('slides-area');
     var slideEls   = [];
@@ -145,9 +129,7 @@
 
     function isVideo(src) { return /\.(mp4|webm|ogg|mov)$/i.test(src); }
 
-    var list = CONFIG.shuffle
-        ? SLIDES.slice().sort(function() { return Math.random() - 0.5; })
-        : SLIDES;
+    var list = [];
 
     // ── Build a video slide with canvas renderer ──────────────────────
     function makeVideoSlide(div, src) {
@@ -184,7 +166,7 @@
                 if (isSignage) {
                     ctx.save();
                     ctx.translate(cw / 2, ch / 2);
-                    ctx.rotate(-Math.PI / 2); // -90° to correct for missing metadata
+                    ctx.rotate(Math.PI / 2); // -90° to correct for missing metadata
                     ctx.drawImage(vid,
                         -(vid.videoWidth  || ch) / 2,
                         -(vid.videoHeight || cw) / 2,
@@ -289,8 +271,19 @@
     });
     document.addEventListener('click', next);
 
-    buildSlides();
-    showSlide(0);
+    // Load slides from central slides.json
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', 'slides.json');
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            list = JSON.parse(xhr.responseText);
+            if (CONFIG.shuffle) list = list.slice().sort(function() { return Math.random() - 0.5; });
+        }
+        buildSlides();
+        showSlide(0);
+    };
+    xhr.onerror = function() { buildSlides(); showSlide(0); };
+    xhr.send();
     </script>
 </body>
 </html>
