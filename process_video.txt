@@ -1,0 +1,14 @@
+@echo off
+echo Input:  %INPUT%
+echo Output: %OUTPUT%
+echo.
+ffmpeg -y -i "%INPUT%" -vf "transpose=1" -c:v libx264 -crf 18 -preset fast -c:a aac -movflags +faststart "%TMPOUT%"
+if %ERRORLEVEL% equ 0 (
+    move /y "%TMPOUT%" "%OUTPUT%"
+    echo.
+    echo Done: %OUTPUT%
+) else (
+    echo.
+    echo FFmpeg failed.
+    if exist "%TMPOUT%" del "%TMPOUT%"
+)

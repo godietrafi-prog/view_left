@@ -1,0 +1,17 @@
+@echo off
+cd /d "%SCRIPT_DIR%"
+echo ================================================
+echo  Poster Viewers - Deploy to GitHub Pages
+echo ================================================
+echo.
+echo Step 1: Rebuilding slides.json...
+wsl -e python3 update_slides.py
+echo.
+echo Step 2: Committing...
+wsl -e git -c core.logAllRefUpdates=false add -A
+wsl -e git -c core.logAllRefUpdates=false commit -m "update media"
+echo.
+echo Step 3: Pushing to GitHub Pages...
+wsl -e git -c core.logAllRefUpdates=false push origin main
+echo.
+echo Done! TVs update within ~1 minute.
