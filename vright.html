@@ -428,6 +428,20 @@
             imgEl.src     = rssItem.image;
             imgEl.alt     = '';
             imgEl.loading = 'eager';
+            imgEl.onerror = function() {
+                // Image 404 (editorial/correction with no figure) — revert to text-only
+                var card = this.closest('.rss-card');
+                if (card) {
+                    card.classList.remove('rss-card--has-image');
+                    var fig = card.querySelector('.rss-card-figure');
+                    var txt = card.querySelector('.rss-card-text');
+                    if (fig) fig.remove();
+                    if (txt) {
+                        txt.style.flex = '1';
+                        txt.style.padding = '5% 9% 4% 9%';
+                    }
+                }
+            };
             figDiv.appendChild(imgEl);
             div.appendChild(figDiv);
         }

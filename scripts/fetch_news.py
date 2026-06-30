@@ -7,62 +7,29 @@ Runs via GitHub Actions every 2 hours — no CORS issues.
 import feedparser
 import json
 import re
-import urllib.request
-import http.cookiejar
+import urllib.parse
 from datetime import datetime, timezone
 from html.parser import HTMLParser
 
 
-# ── og:image fetching ──────────────────────────────────────────────────────
-def make_nature_opener():
-    """Cookie-jar opener for nature.com (bypasses their cookie wall)."""
-    cj = http.cookiejar.CookieJar()
-    opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
-    opener.addheaders = [
-        ("User-Agent",
-         "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
-         "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"),
-        ("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"),
-        ("Accept-Language", "en-US,en;q=0.9"),
-    ]
-    try:
-        opener.open("https://www.nature.com/", timeout=8)
-    except Exception:
-        pass
-    return opener
+# ── Figure URL construction ────────────────────────────────────────────────
+def springer_fig1_url(article_url: str, year: int) -> str:
+    """Construct the Springer Nature CDN URL for Fig1 from an article URL.
 
-
-def fetch_og_image(url: str, opener=None) -> str:
-    """Return the og:image URL for an article page, or '' on failure."""
-    if not url:
+    Nature article URL pattern: .../articles/s{journal}-{yy}-{num}-{check}
+    CDN pattern: media.springernature.com/m685/springer-static/image/
+                 art%3A{encoded_doi}/MediaObjects/{journal}_{year}_{num}_Fig1_HTML.png
+    """
+    m = re.search(r'nature\.com/articles/(s(\d+)-\d+-0*(\d+)-\d+)', article_url)
+    if not m:
         return ""
-    try:
-        if opener:
-            with opener.open(url, timeout=12) as r:
-                html = r.read(200000).decode("utf-8", errors="ignore")
-        else:
-            req = urllib.request.Request(
-                url, headers={"User-Agent":
-                "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36"})
-            with urllib.request.urlopen(req, timeout=12) as r:
-                html = r.read(200000).decode("utf-8", errors="ignore")
-
-        for pat in [
-            r'property=["\']og:image["\'][^>]*content=["\']([^"\']+)',
-            r'content=["\']([^"\']+)["\'][^>]*property=["\']og:image',
-            r'name=["\']twitter:image["\'][^>]*content=["\']([^"\']+)',
-            r'content=["\']([^"\']+)["\'][^>]*name=["\']twitter:image',
-        ]:
-            m = re.search(pat, html, re.I)
-            if m:
-                img = m.group(1).strip()
-                # Skip generic journal logos/icons
-                if any(x in img for x in ["logo", "icon", "favicon", "rss.png", "header-"]):
-                    continue
-                return img
-    except Exception as e:
-        print(f"    og:image error ({url[:60]}): {e}")
-    return ""
+    suffix    = m.group(1)          # s43016-026-01368-3
+    journal   = m.group(2)          # 43016
+    art_num   = int(m.group(3))     # 1368 (leading zeros stripped)
+    doi       = f"10.1038/{suffix}"
+    enc       = urllib.parse.quote(f"art:{doi}", safe="")
+    return (f"https://media.springernature.com/m685/springer-static/image/"
+            f"{enc}/MediaObjects/{journal}_{year}_{art_num}_Fig1_HTML.png")
 
 FEEDS = [
     {"url": "https://www.nature.com/natfood.rss",
@@ -125,9 +92,7 @@ def clean_summary(raw: str) -> str:
 
 
 items = []
-
-# Prime Nature cookie opener once
-nature_opener = make_nature_opener()
+current_year = datetime.now(timezone.utc).year
 
 for feed_info in FEEDS:
     is_nature = "nature.com" in feed_info["url"]
@@ -159,11 +124,10 @@ for feed_info in FEEDS:
             if len(summary) > SUMMARY_MAX:
                 summary = summary[:SUMMARY_MAX - 3] + "..."
 
-            # Fetch og:image (Nature only — Elsevier returns 403)
+            # Build Fig1 URL from DOI (Nature only; no HTTP request needed)
             image = ""
             if is_nature and article_url:
-                image = fetch_og_image(article_url, opener=nature_opener)
-                print(f"    image: {'OK' if image else 'none'} — {title[:50]}")
+                image = springer_fig1_url(article_url, current_year)
 
             items.append({
                 "title":    title,
