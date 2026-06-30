@@ -90,6 +90,52 @@
             width: auto;
             object-fit: contain;
         }
+
+        /* ── News ticker ── */
+        #news-ticker {
+            flex: 0 0 6%;
+            background: #0d1b2a;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            border-top: 2px solid rgba(78,201,106,0.5);
+        }
+        #ticker-label {
+            flex-shrink: 0;
+            background: #4EC96A;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            font-size: 1em;
+            font-weight: bold;
+            padding: 0 1.5%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+            letter-spacing: 0.04em;
+        }
+        #ticker-scroll {
+            flex: 1;
+            overflow: hidden;
+            height: 100%;
+            position: relative;
+        }
+        #ticker-inner {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            white-space: nowrap;
+            font-family: Arial, sans-serif;
+            font-size: 0.95em;
+            color: #c8f5d6;
+            padding-left: 100%;
+            transform: translateY(-50%);
+            will-change: transform;
+        }
+        @keyframes ticker-move {
+            from { transform: translateY(-50%) translateX(0); }
+            to   { transform: translateY(-50%) translateX(-100%); }
+        }
     </style>
 </head>
 <body>
@@ -102,6 +148,10 @@
             <div class="dot"></div>
         </div>
         <div id="slides-area"></div>
+        <div id="news-ticker">
+            <div id="ticker-label">RESEARCH NEWS</div>
+            <div id="ticker-scroll"><div id="ticker-inner">Loading headlines...</div></div>
+        </div>
         <div id="bottom-bar">
             <img id="logo" src="Logo_official_eng.png" alt="Tel-Hai">
         </div>
@@ -112,7 +162,8 @@
     // CONFIGURATION
     // ================================================================
     var CONFIG = {
-        defaultImageDuration: 10,   // seconds for images/posters
+        posterDuration: 30,   // seconds for research posters
+        imageDuration:  7,    // seconds for regular images
         loop: true
     };
 
@@ -196,14 +247,15 @@
 
             if (isVideo(item.src)) {
                 div.setAttribute('data-type', 'video');
-                makeVideoSlide(div, item.src);
+                makeVideoSlide(div, item.src_left || item.src);
             } else {
                 var img = document.createElement('img');
                 img.src     = item.src;
                 img.alt     = '';
                 img.loading = 'eager';
                 div.setAttribute('data-type', 'image');
-                var dur = (item.duration != null) ? item.duration : CONFIG.defaultImageDuration;
+                var dur = (item.duration != null) ? item.duration :
+                          (item.type === 'poster' ? CONFIG.posterDuration : CONFIG.imageDuration);
                 div.setAttribute('data-duration', String(dur));
                 div.appendChild(img);
             }
@@ -285,6 +337,74 @@
     };
     xhr.onerror = function() { buildPool(); playlist = buildPlaylist(); showSlide(0); };
     xhr.send();
+
+    // ================================================================
+    // NEWS TICKER (RSS)
+    // ================================================================
+    var TICKER = {
+        proxy: 'https://feed2json.org/convert?url=',
+        feeds: [
+            'https://www.nature.com/natfood.rss',
+            'https://rss.sciencedirect.com/publication/science/03088146',
+            'https://rss.sciencedirect.com/publication/science/09242244',
+            'https://rss.sciencedirect.com/publication/science/09503293',
+        ],
+        fallback: [
+            'Nature Food: Advancing sustainable food systems through science',
+            'JAFC: Latest research in agricultural and food chemistry',
+            'Food Chemistry: Novel analytical methods for food quality assessment',
+            'Analytical Chemistry: Breakthrough techniques in chemical analysis',
+            'Metabolomics and multi-omics approaches in food science',
+        ],
+        items: [],
+        feedIndex: 0
+    };
+
+    var tickerInner = document.getElementById('ticker-inner');
+    var tickerScroll = document.getElementById('ticker-scroll');
+
+    function tickerFetchNext() {
+        if (TICKER.feedIndex >= TICKER.feeds.length) { tickerBuild(); return; }
+        var url = TICKER.proxy + encodeURIComponent(TICKER.feeds[TICKER.feedIndex]);
+        var req = new XMLHttpRequest();
+        req.open('GET', url);
+        req.timeout = 8000;
+        req.onload = function() {
+            try {
+                var d = JSON.parse(req.responseText);
+                if (d.items && d.items.length) {
+                    d.items.slice(0, 5).forEach(function(it) {
+                        if (it.title) TICKER.items.push(it.title);
+                    });
+                }
+            } catch(e) {}
+            TICKER.feedIndex++;
+            tickerFetchNext();
+        };
+        req.onerror = req.ontimeout = function() { TICKER.feedIndex++; tickerFetchNext(); };
+        req.send();
+    }
+
+    function tickerBuild() {
+        var titles = TICKER.items.length ? TICKER.items : TICKER.fallback;
+        var arr = titles.slice();
+        for (var i = arr.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+        }
+        var text = arr.join('   \u25C6   ');
+        tickerInner.textContent = text;
+        tickerInner.style.animation = 'none';
+        tickerInner.getBoundingClientRect(); // force reflow
+        var containerW = tickerScroll.offsetWidth || 800;
+        var textW = text.length * 9; // ~9px per char estimate
+        var duration = Math.round((containerW + textW) / 80); // 80px/s scroll speed
+        tickerInner.style.animation = duration + 's ticker-move linear infinite';
+    }
+
+    function tickerRefresh() { TICKER.items = []; TICKER.feedIndex = 0; tickerFetchNext(); }
+    setTimeout(tickerRefresh, 3000);
+    setInterval(tickerRefresh, 30 * 60 * 1000);
 
     </script>
 </body>
