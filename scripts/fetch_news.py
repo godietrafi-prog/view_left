@@ -74,20 +74,29 @@ MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
           "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
 
-def extract_abstract(entry) -> str:
-    """Return article abstract (Nature only — Elsevier has none in RSS)."""
-    raw_html = ""
-    if hasattr(entry, "content") and entry.content:
-        raw_html = entry.content[0].get("value", "")
-    if not raw_html:
+def extract_abstract(entry, feed_type: str) -> str:
+    """Return article abstract text, or '' if not available."""
+    if feed_type == "nature":
+        # Nature: abstract follows "doi:DOI " in content:encoded
+        raw_html = ""
+        if hasattr(entry, "content") and entry.content:
+            raw_html = entry.content[0].get("value", "")
+        if not raw_html:
+            return ""
+        raw_text = strip_html(raw_html)
+        m = re.search(r"doi:\S+\s+(.*)", raw_text, re.DOTALL)
+        if m:
+            text = re.sub(r"\s+", " ", m.group(1)).strip()
+            return (text[:420] + "…") if len(text) > 420 else text
         return ""
-    raw_text = strip_html(raw_html)
-    # Nature content: "Nature Food, Published online: DATE; doi:DOI  ABSTRACT"
-    m = re.search(r"doi:\S+\s+(.*)", raw_text, re.DOTALL)
-    if m:
-        text = re.sub(r"\s+", " ", m.group(1)).strip()
+    elif feed_type == "frontiers":
+        # Frontiers: abstract is plain text in entry.summary
+        text = re.sub(r"\s+", " ", strip_html(entry.get("summary", ""))).strip()
+        if len(text) < 80:
+            return ""
         return (text[:420] + "…") if len(text) > 420 else text
-    return ""
+    else:
+        return ""  # Elsevier: no abstract in RSS
 
 
 def extract_authors(entry, raw_html: str) -> str:
@@ -127,13 +136,17 @@ def extract_date(entry, raw_html: str) -> str:
 # ── Feed configuration ─────────────────────────────────────────────────────
 FEEDS = [
     {"url": "https://www.nature.com/natfood.rss",
-     "name": "Nature Food"},
+     "name": "Nature Food",              "type": "nature"},
     {"url": "https://rss.sciencedirect.com/publication/science/03088146",
-     "name": "Food Chemistry"},
+     "name": "Food Chemistry",           "type": "elsevier"},
     {"url": "https://rss.sciencedirect.com/publication/science/09242244",
-     "name": "Trends in Food Science & Technology"},
+     "name": "Trends in Food Sci & Tech","type": "elsevier"},
     {"url": "https://rss.sciencedirect.com/publication/science/09503293",
-     "name": "Food Quality & Preference"},
+     "name": "Food Quality & Preference","type": "elsevier"},
+    {"url": "https://www.frontiersin.org/journals/nutrition/rss",
+     "name": "Frontiers Nutrition",      "type": "frontiers"},
+    {"url": "https://www.frontiersin.org/journals/food-science-and-technology/rss",
+     "name": "Frontiers Food Science",   "type": "frontiers"},
 ]
 
 MAX_PER_FEED = 4   # cards shown per feed
@@ -155,7 +168,8 @@ items        = []
 current_year = datetime.now(timezone.utc).year
 
 for feed_info in FEEDS:
-    is_nature = "nature.com" in feed_info["url"]
+    feed_type = feed_info.get("type", "generic")
+    is_nature = feed_type == "nature"
     try:
         feed  = feedparser.parse(feed_info["url"],
                                  request_headers={"User-Agent": BROWSER_UA})
@@ -170,7 +184,7 @@ for feed_info in FEEDS:
             article_url = entry.get("link", "")
             raw_html    = get_raw_html(entry)
 
-            abstract  = extract_abstract(entry) if is_nature else ""
+            abstract  = extract_abstract(entry, feed_type)
             authors   = extract_authors(entry, raw_html)
             published = extract_date(entry, raw_html)
             image     = springer_fig1_url(article_url, current_year) if is_nature else ""

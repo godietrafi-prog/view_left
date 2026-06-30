@@ -194,6 +194,84 @@
             opacity: 0.92;
         }
 
+        /* ── Dual compact card slide (two articles, no abstract/image) ── */
+        .rss-dual {
+            background: linear-gradient(155deg, #071422 0%, #0e2d1c 55%, #071422 100%);
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 5% 9% 4% 9%;
+            overflow: hidden;
+        }
+        .rss-compact {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-left: 5%;
+            border-left: 3px solid rgba(78, 201, 106, 0.4);
+        }
+        .rss-compact--second {
+            border-top: 1px solid rgba(78, 201, 106, 0.18);
+            margin-top: 4%;
+            padding-top: 4%;
+        }
+        .rss-compact-badge {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(78, 201, 106, 0.10);
+            border: 1px solid rgba(78, 201, 106, 0.6);
+            color: #4EC96A;
+            font-family: Arial, sans-serif;
+            font-size: 0.82em;
+            font-weight: bold;
+            padding: 0.2em 0.9em;
+            border-radius: 2em;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-bottom: 2%;
+            flex-shrink: 0;
+        }
+        .rss-compact-title {
+            font-family: Georgia, 'Times New Roman', serif;
+            font-size: 1.85em;
+            color: #ffffff;
+            line-height: 1.2;
+            font-weight: bold;
+            margin-bottom: 2%;
+            flex-shrink: 0;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        .rss-compact-meta {
+            display: flex;
+            align-items: center;
+            gap: 2.5%;
+            flex-shrink: 0;
+        }
+        .rss-compact-authors {
+            font-family: Arial, sans-serif;
+            font-size: 0.9em;
+            color: #5a9a6a;
+            font-style: italic;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .rss-compact-date {
+            font-family: Arial, sans-serif;
+            font-size: 0.85em;
+            color: #4EC96A;
+            font-weight: bold;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+
         /* ── News ticker ── */
         #news-ticker {
             flex: 0 0 6%;
@@ -319,7 +397,44 @@
         return (d.textContent || d.innerText || '').replace(/\s+/g, ' ').trim();
     }
 
-    // Every round: 3 posters → 1 rss_card, every 4 posters → 1 image
+    function makeRSSDualSlide(div, card1, card2) {
+        var wrap = document.createElement('div');
+        wrap.className = 'rss-dual';
+        [card1, card2].forEach(function(rssItem, idx) {
+            if (!rssItem) return;
+            var cardEl = document.createElement('div');
+            cardEl.className = 'rss-compact' + (idx === 1 ? ' rss-compact--second' : '');
+            var badgeEl = document.createElement('div');
+            badgeEl.className   = 'rss-compact-badge';
+            badgeEl.textContent = rssItem.feedName;
+            cardEl.appendChild(badgeEl);
+            var titleEl = document.createElement('div');
+            titleEl.className   = 'rss-compact-title';
+            titleEl.textContent = rssItem.title;
+            cardEl.appendChild(titleEl);
+            if (rssItem.authors || rssItem.published) {
+                var metaEl = document.createElement('div');
+                metaEl.className = 'rss-compact-meta';
+                if (rssItem.authors) {
+                    var authEl = document.createElement('span');
+                    authEl.className   = 'rss-compact-authors';
+                    authEl.textContent = rssItem.authors;
+                    metaEl.appendChild(authEl);
+                }
+                if (rssItem.published) {
+                    var dateEl = document.createElement('span');
+                    dateEl.className   = 'rss-compact-date';
+                    dateEl.textContent = rssItem.published;
+                    metaEl.appendChild(dateEl);
+                }
+                cardEl.appendChild(metaEl);
+            }
+            wrap.appendChild(cardEl);
+        });
+        div.appendChild(wrap);
+    }
+
+    // Every round: 2 posters → 1 rss slide (rich or dual), every 3 → 1 image
     function buildPlaylist() {
         var byType = {};
         for (var i = 0; i < pool.length; i++) {
@@ -329,8 +444,8 @@
         }
         var posters  = shuffle(byType['poster']   || []);
         var images   = shuffle(byType['image']    || []);
-        var rssCards = shuffle(byType['rss_card'] || []);
         var videos   = shuffle(byType['video']    || []);
+        var rssCards = shuffle((byType['rss_card'] || []).concat(byType['rss_dual'] || []));
 
         var pl = [];
         var ii = 0, ri = 0, vi = 0;
@@ -436,6 +551,10 @@
                 div.setAttribute('data-type', 'image');
                 div.setAttribute('data-duration', String(item.duration || CONFIG.rssCardDuration));
                 makeRSSCardSlide(div, item._rssItem);
+            } else if (item.type === 'rss_dual') {
+                div.setAttribute('data-type', 'image');
+                div.setAttribute('data-duration', String(item.duration || CONFIG.rssCardDuration));
+                makeRSSDualSlide(div, item._cards[0], item._cards[1]);
             } else if (isVideo(item.src)) {
                 div.setAttribute('data-type', 'video');
                 makeVideoSlide(div, item.src_right || item.src);
@@ -515,29 +634,35 @@
     var tickerInner = document.getElementById('ticker-inner');
     var tickerScroll = document.getElementById('ticker-scroll');
 
-    // Load news.json (generated by GitHub Actions, same-origin — no CORS)
+    // Load news.json — classify as rich (full slide) or compact (two per slide)
     function rssFetchAll(callback) {
         var req = new XMLHttpRequest();
         req.open('GET', NEWS_JSON + '?v=' + Date.now());
         req.timeout = 8000;
         req.onload = function() {
-            var allItems = [];
+            var rich = [], compact = [];
             try {
                 var d = JSON.parse(req.responseText);
                 (d.items || []).forEach(function(it) {
                     if (!it.title) return;
-                    allItems.push({
-                        type:     'rss_card',
-                        duration: CONFIG.rssCardDuration,
-                        _rssItem: { title:     it.title,
+                    var rssItem = { title:     it.title,
                                     abstract:  it.abstract  || '',
                                     authors:   it.authors   || '',
                                     published: it.published || '',
                                     feedName:  it.feedName,
-                                    image:     it.image     || '' }
-                    });
+                                    image:     it.image     || '' };
+                    if (rssItem.abstract || rssItem.image) {
+                        rich.push({ type: 'rss_card', duration: CONFIG.rssCardDuration, _rssItem: rssItem });
+                    } else {
+                        compact.push(rssItem);
+                    }
                 });
             } catch(e) {}
+            var allItems = rich.slice();
+            for (var i = 0; i < compact.length; i += 2) {
+                allItems.push({ type: 'rss_dual', duration: CONFIG.rssCardDuration,
+                                _cards: compact.slice(i, i + 2) });
+            }
             callback(allItems);
         };
         req.onerror = req.ontimeout = function() { callback([]); };
@@ -552,9 +677,12 @@
             'Food Quality & Preference: Consumer science and sensory evaluation',
             'Metabolomics and multi-omics approaches in food research',
         ];
-        var titles = rssItems.length
-            ? rssItems.map(function(it) { return it._rssItem.title; })
-            : FALLBACK;
+        var titles = [];
+        rssItems.forEach(function(it) {
+            if (it.type === 'rss_card') titles.push(it._rssItem.title);
+            if (it.type === 'rss_dual') it._cards.forEach(function(c){ if(c) titles.push(c.title); });
+        });
+        if (!titles.length) titles = FALLBACK;
         var arr = shuffle(titles);
         var text = arr.join('   \u25C6   ');
         tickerInner.textContent = text;
