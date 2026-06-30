@@ -77,7 +77,7 @@ MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
 def extract_abstract(entry, feed_type: str) -> str:
     """Return article abstract text, or '' if not available."""
     if feed_type == "nature":
-        # Nature: abstract follows "doi:DOI " in content:encoded
+        # Nature Food: abstract follows "doi:DOI " in content:encoded
         raw_html = ""
         if hasattr(entry, "content") and entry.content:
             raw_html = entry.content[0].get("value", "")
@@ -89,14 +89,36 @@ def extract_abstract(entry, feed_type: str) -> str:
             text = re.sub(r"\s+", " ", m.group(1)).strip()
             return (text[:ABSTRACT_MAX] + "…") if len(text) > ABSTRACT_MAX else text
         return ""
-    elif feed_type == "frontiers":
-        # Frontiers: abstract is plain text in entry.summary
+    elif feed_type in ("frontiers", "generic"):
+        # Frontiers + generic news feeds: summary field (plain text or light HTML)
         text = re.sub(r"\s+", " ", strip_html(entry.get("summary", ""))).strip()
-        if len(text) < 80:
+        if len(text) < 60:
             return ""
         return (text[:ABSTRACT_MAX] + "…") if len(text) > ABSTRACT_MAX else text
     else:
         return ""  # Elsevier: no abstract in RSS
+
+
+def extract_image(entry) -> str:
+    """Return an image URL from media:content, media:thumbnail, or enclosure."""
+    # media:content (Phys.org, Wired, etc.)
+    mc = getattr(entry, "media_content", None)
+    if mc:
+        for m in mc:
+            url = m.get("url", "")
+            if url and re.search(r"\.(jpg|jpeg|png|webp)", url, re.I):
+                return url
+    # media:thumbnail
+    mt = getattr(entry, "media_thumbnail", None)
+    if mt:
+        url = mt[0].get("url", "") if mt else ""
+        if url:
+            return url
+    # enclosure (podcasts / some RSS)
+    for enc in getattr(entry, "enclosures", []):
+        if enc.get("type", "").startswith("image/"):
+            return enc.get("href", "")
+    return ""
 
 
 def extract_authors(entry, raw_html: str) -> str:
@@ -135,6 +157,7 @@ def extract_date(entry, raw_html: str) -> str:
 
 # ── Feed configuration ─────────────────────────────────────────────────────
 FEEDS = [
+    # ── Academic journals ──────────────────────────────────────────────────
     {"url": "https://www.nature.com/natfood.rss",
      "name": "Nature Food",              "type": "nature"},
     {"url": "https://rss.sciencedirect.com/publication/science/03088146",
@@ -147,6 +170,11 @@ FEEDS = [
      "name": "Frontiers Anal. Science",  "type": "frontiers"},
     {"url": "https://www.frontiersin.org/journals/food-science-and-technology/rss",
      "name": "Frontiers Food Science",   "type": "frontiers"},
+    # ── Science news ───────────────────────────────────────────────────────
+    {"url": "https://phys.org/rss-feed/chemistry-news/analytical-chemistry/",
+     "name": "Phys.org Analytics",       "type": "generic"},
+    {"url": "https://www.sciencedaily.com/rss/plants_animals/biotechnology_and_bioengineering.xml",
+     "name": "ScienceDaily Biotech",     "type": "generic"},
 ]
 
 MAX_PER_FEED = 4   # cards shown per feed
@@ -187,7 +215,12 @@ for feed_info in FEEDS:
             abstract  = extract_abstract(entry, feed_type)
             authors   = extract_authors(entry, raw_html)
             published = extract_date(entry, raw_html)
-            image     = springer_fig1_url(article_url, current_year) if is_nature else ""
+            if is_nature:
+                image = springer_fig1_url(article_url, current_year)
+            elif feed_type == "generic":
+                image = extract_image(entry)
+            else:
+                image = ""
 
             items.append({
                 "title":     title,

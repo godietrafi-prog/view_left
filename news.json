@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-30T14:33:48Z",
+  "updated": "2026-06-30T14:40:03Z",
   "items": [
     {
       "title": "A cognitive perspective for climate-smart agricultural policy in the Indo-Pacific region",
@@ -215,6 +215,78 @@
       "published": "Jun 2026",
       "feedName": "Frontiers Food Science",
       "url": "https://www.frontiersin.org/articles/10.3389/frfst.2026.1892391",
+      "image": ""
+    },
+    {
+      "title": "How PFAS chain length influences environmental fate and water treatment",
+      "abstract": "Per- and polyfluoroalkyl substances (PFAS), often referred to as \"forever chemicals,\" are among the most persistent contaminants found in water systems worldwide. Their strong carbon-fluorine bonds make them highly resistant to degradation, allowing them to remain in the environment for long periods. While PFAS are often treated as a single group of pollutants, growing evidence suggests that differences in their molecular structure can significantly influence both their environmental behavior and their response to treatment technologies.",
+      "authors": "",
+      "published": "Jun 2026",
+      "feedName": "Phys.org Analytics",
+      "url": "https://phys.org/news/2026-06-pfas-chain-length-environmental-fate.html",
+      "image": "https://scx1.b-cdn.net/csz/news/tmb/2026/hanyang-university-res-2.jpg"
+    },
+    {
+      "title": "AI tool reliably predicts the flame resistance of new materials",
+      "abstract": "Researchers at IMDEA Materials Institute have developed an artificial intelligence (AI)-based strategy to predict and assess the fire resistance of epoxy resins, one of the most widely used polymers in industry.",
+      "authors": "",
+      "published": "Jun 2026",
+      "feedName": "Phys.org Analytics",
+      "url": "https://phys.org/news/2026-06-ai-tool-reliably-flame-resistance.html",
+      "image": "https://scx1.b-cdn.net/csz/news/tmb/2026/an-ai-tool-that-reliab.jpg"
+    },
+    {
+      "title": "Faster tests reveal six fluoropolymer microplastics, including four rarely tracked types",
+      "abstract": "Scientists around the world have been searching food, water and other environmental media for microplastics and for per- and polyfluoroalkyl substances (PFAS). But microfluoroplastics (MFPs), the intersection between these two fields, have received much less attention.",
+      "authors": "",
+      "published": "Jun 2026",
+      "feedName": "Phys.org Analytics",
+      "url": "https://phys.org/news/2026-06-faster-reveal-fluoropolymer-microplastics-rarely.html",
+      "image": "https://scx1.b-cdn.net/csz/news/tmb/2026/nonstick-pan-cooking-e-1.jpg"
+    },
+    {
+      "title": "Table sugar could hold a cheaper, quicker key to making vital drugs",
+      "abstract": "Pioneering research has developed a new way of creating carbohydrate-based medicines that could ultimately replace costly drugs for common health conditions, using two cheap basic ingredients—table sugar and vinegar.",
+      "authors": "",
+      "published": "Jun 2026",
+      "feedName": "Phys.org Analytics",
+      "url": "https://phys.org/news/2026-06-table-sugar-cheaper-quicker-key.html",
+      "image": "https://scx1.b-cdn.net/csz/news/tmb/2026/new-study-shows-table.jpg"
+    },
+    {
+      "title": "Scientists just found what keeps plant cells from growing out of control",
+      "abstract": "Before seedlings can photosynthesize, they depend on fatty acids—and on peroxisomes to process them. Researchers discovered that the protein PEX11 not only helps these structures divide but also controls their size during early growth. When key genes were altered, peroxisomes grew abnormally large, suggesting internal vesicles normally keep them in balance. Remarkably, a yeast version of the protein fixed the problem, pointing to a deeply conserved mechanism across species.",
+      "authors": "",
+      "published": "Apr 2026",
+      "feedName": "ScienceDaily Biotech",
+      "url": "https://www.sciencedaily.com/releases/2026/04/260424233201.htm",
+      "image": ""
+    },
+    {
+      "title": "A donut-shaped protein breaks apart to start bacterial cell division",
+      "abstract": "Researchers have revealed how bacteria precisely control the genes that trigger cell division. The study shows that the MraZ protein, which normally forms a donut-shaped structure, must bend and partially break apart to bind key DNA sequences that activate division genes. Using cryo-electron microscopy, scientists captured this interaction in remarkable detail. The mechanism appears to be widespread across bacteria, offering a new window into how microbes regulate growth.",
+      "authors": "",
+      "published": "Mar 2026",
+      "feedName": "ScienceDaily Biotech",
+      "url": "https://www.sciencedaily.com/releases/2026/03/260314030457.htm",
+      "image": ""
+    },
+    {
+      "title": "Light-guided evolution creates proteins that can switch, sense, and compute",
+      "abstract": "Researchers have created a method called optovolution that uses light to guide the evolution of proteins with dynamic behaviors. By engineering yeast cells so their survival depended on proteins switching states at the right time, scientists could rapidly select the best-performing variants. The technique produced new light-sensitive proteins that respond to different colors and improved optogenetic systems. It even evolved a protein that behaves like a tiny logic gate, activating genes only when two signals are present.",
+      "authors": "",
+      "published": "Mar 2026",
+      "feedName": "ScienceDaily Biotech",
+      "url": "https://www.sciencedaily.com/releases/2026/03/260309183211.htm",
+      "image": ""
+    },
+    {
+      "title": "The 4x rule: Why some people’s DNA is more unstable than others",
+      "abstract": "A large genetic study shows that many people carry DNA sequences that slowly expand as they get older. Common genetic variants can dramatically alter how fast this expansion happens, sometimes multiplying the pace by four. Researchers also identified specific DNA expansions linked to severe kidney and liver disease. The findings suggest that age-related DNA instability is far more common than previously realized.",
+      "authors": "",
+      "published": "Jan 2026",
+      "feedName": "ScienceDaily Biotech",
+      "url": "https://www.sciencedaily.com/releases/2026/01/260109080214.htm",
       "image": ""
     }
   ]
