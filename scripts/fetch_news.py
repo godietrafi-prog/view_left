@@ -245,6 +245,8 @@ def fetch_s2_papers(researcher: dict, cutoff_year: int) -> list:
             authors_str = ", ".join(author_names)
         doi = ((p.get("externalIds") or {}).get("DOI") or "")
         abstract = (p.get("abstract") or "").strip()
+        if not abstract:
+            continue  # no abstract = no slide, same rule as RSS articles
         if len(abstract) > ABSTRACT_MAX:
             abstract = abstract[:ABSTRACT_MAX] + "…"
         papers.append({
