@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-01T18:25:14Z",
+  "updated": "2026-07-01T19:03:26Z",
   "items": [
     {
       "title": "A cognitive perspective for climate-smart agricultural policy in the Indo-Pacific region",
@@ -412,12 +412,12 @@
       "screen": "right"
     },
     {
-      "title": "Can artificial intelligence applications improve food supply capacity? Evidence from 296 Chinese cities",
-      "abstract": "IntroductionAgainst the backdrop of the rapid development of the digital economy, artificial intelligence (AI) has become an increasingly important driver of agricultural modernization and food supply capacity improvement. This study examines the impact of AI development on food supply capacity and further explores the mechanisms and regional differences underlying this relationship.MethodsUsing panel data from 296 Chinese cities from 2010 to 2024, this study constructs a two-way fixed-effects model to evaluate the effect of AI development on food supply capacity. A series of robustness tests, endogeneity tests, lagged-effect tests, mechanism analyses, and heterogeneity analyses are conducted to verify the reliability of the findings and identify the channels through which AI exerts its influence.ResultsThe empirical results show that AI development significantly enhances food supply capacity, and this conclusion remains robust after multiple robustness and endogeneity checks. The lagged-effect analysis indicates that the positive impact of AI persists over time rather than being limited to the short term. Mechanism tests further reveal that AI improves food supply capacity mainly by increasing agricultural production efficiency and promoting the more efficient allocation of agricultural resources. Heterogeneity analysis shows that the promoting effect of AI is more pronounced in central China, major grain-producing regions, areas with relatively abundant precipitation, and regions with more advanced digital infrastructure.DiscussionThese findings suggest that AI has gradua…",
-      "authors": "Fangyan Bai, Chunyan Li, Qi Ban et al.",
+      "title": "Vitamins as modulators of neonatal intestinal injury",
+      "abstract": "Necrotizing enterocolitis (NEC) is a severe gastrointestinal disease that primarily affects premature infants. It is characterized by intestinal injury and tissue necrosis involving both small and large intestines. Loss of epithelial barrier integrity allows enteric bacteria to translocate into the bloodstream, frequently leading to severe sepsis and high mortality, with reported rates ranging from 15 to 45%. Infants who survive often experience long-term complications, including neurodevelopmental impairment, growth restriction, and short-bowel syndrome. Vitamins help maintain intestinal barrier integrity and regulate immune and inflammatory responses, suggesting an important role in the development and progression of NEC. Vitamins are important modulators of NEC pathophysiology and may serve as adjunctive therapeutic agents through multiple molecular mechanisms. Vitamins A and D promote epithelial barrier maturation and immune homeostasis by limiting excessive Toll-like receptor 4 (TLR4) activation, a major contributor to epithelial injury and inflammation in the immature intestine. Vitamins E and C reduce oxidative stress, a key feature of NEC, while supporting regulatory T-cell function and IgA-mediated mucosal immunity. However, their use in preterm infants requires careful consideration of dosage and route of administration. Vitamin K contributes to both immune regulation and hemostasis by maintaining protein S-dependent anticoagulant activity and suppressing TLR-mediated inflammatory signaling, thereby reducing intestinal microvascular injury. Folate attenuates lipop…",
+      "authors": "Dhirendra K. Singh, Yukihiro Yamaguchi, Chieko Saito et al.",
       "published": "Jul 2026",
       "feedName": "Frontiers Nutrition",
-      "url": "https://www.frontiersin.org/articles/10.3389/fnut.2026.1877178",
+      "url": "https://www.frontiersin.org/articles/10.3389/fnut.2026.1860890",
       "image": "",
       "screen": "right"
     },
@@ -454,7 +454,7 @@
       "lab_paper": true,
       "researcher": {
         "name": "Iris Zohar",
-        "photo": ""
+        "photo": "https://scholar.googleusercontent.com/citations?view_op=view_photo&user=0qOb-iYAAAAJ"
       }
     },
     {
@@ -470,7 +470,7 @@
       "lab_paper": true,
       "researcher": {
         "name": "Iris Zohar",
-        "photo": ""
+        "photo": "https://scholar.googleusercontent.com/citations?view_op=view_photo&user=0qOb-iYAAAAJ"
       }
     },
     {
@@ -486,7 +486,7 @@
       "lab_paper": true,
       "researcher": {
         "name": "Iris Zohar",
-        "photo": ""
+        "photo": "https://scholar.googleusercontent.com/citations?view_op=view_photo&user=0qOb-iYAAAAJ"
       }
     },
     {
@@ -502,7 +502,7 @@
       "lab_paper": true,
       "researcher": {
         "name": "Iris Zohar",
-        "photo": ""
+        "photo": "https://scholar.googleusercontent.com/citations?view_op=view_photo&user=0qOb-iYAAAAJ"
       }
     },
     {
@@ -518,7 +518,7 @@
       "lab_paper": true,
       "researcher": {
         "name": "Iris Zohar",
-        "photo": ""
+        "photo": "https://scholar.googleusercontent.com/citations?view_op=view_photo&user=0qOb-iYAAAAJ"
       }
     },
     {
@@ -534,7 +534,7 @@
       "lab_paper": true,
       "researcher": {
         "name": "Iris Zohar",
-        "photo": ""
+        "photo": "https://scholar.googleusercontent.com/citations?view_op=view_photo&user=0qOb-iYAAAAJ"
       }
     },
     {
@@ -550,7 +550,7 @@
       "lab_paper": true,
       "researcher": {
         "name": "Iris Zohar",
-        "photo": ""
+        "photo": "https://scholar.googleusercontent.com/citations?view_op=view_photo&user=0qOb-iYAAAAJ"
       }
     },
     {
@@ -566,7 +566,7 @@
       "lab_paper": true,
       "researcher": {
         "name": "Ofir Benjamin",
-        "photo": ""
+        "photo": "https://scholar.googleusercontent.com/citations?view_op=view_photo&user=FsjV0oIAAAAJ"
       }
     },
     {
@@ -582,7 +582,7 @@
       "lab_paper": true,
       "researcher": {
         "name": "Ofir Benjamin",
-        "photo": ""
+        "photo": "https://scholar.googleusercontent.com/citations?view_op=view_photo&user=FsjV0oIAAAAJ"
       }
     },
     {
@@ -598,7 +598,7 @@
       "lab_paper": true,
       "researcher": {
         "name": "Ofir Benjamin",
-        "photo": ""
+        "photo": "https://scholar.googleusercontent.com/citations?view_op=view_photo&user=FsjV0oIAAAAJ"
       }
     },
     {
@@ -614,7 +614,7 @@
       "lab_paper": true,
       "researcher": {
         "name": "Ofir Benjamin",
-        "photo": ""
+        "photo": "https://scholar.googleusercontent.com/citations?view_op=view_photo&user=FsjV0oIAAAAJ"
       }
     },
     {
@@ -630,7 +630,7 @@
       "lab_paper": true,
       "researcher": {
         "name": "Ofir Benjamin",
-        "photo": ""
+        "photo": "https://scholar.googleusercontent.com/citations?view_op=view_photo&user=FsjV0oIAAAAJ"
       }
     },
     {
@@ -646,7 +646,7 @@
       "lab_paper": true,
       "researcher": {
         "name": "Ofir Benjamin",
-        "photo": ""
+        "photo": "https://scholar.googleusercontent.com/citations?view_op=view_photo&user=FsjV0oIAAAAJ"
       }
     },
     {
@@ -662,7 +662,7 @@
       "lab_paper": true,
       "researcher": {
         "name": "Adi Jonas-Levi",
-        "photo": ""
+        "photo": "https://scholar.googleusercontent.com/citations?view_op=view_photo&user=oX6_j4gAAAAJ"
       }
     },
     {
@@ -678,7 +678,7 @@
       "lab_paper": true,
       "researcher": {
         "name": "Adi Jonas-Levi",
-        "photo": ""
+        "photo": "https://scholar.googleusercontent.com/citations?view_op=view_photo&user=oX6_j4gAAAAJ"
       }
     },
     {
@@ -758,7 +758,7 @@
       "lab_paper": true,
       "researcher": {
         "name": "Gilad Davidson-Rozenfeld",
-        "photo": ""
+        "photo": "https://scholar.googleusercontent.com/citations?view_op=view_photo&user=vh7tqKQAAAAJ"
       }
     },
     {
@@ -774,7 +774,7 @@
       "lab_paper": true,
       "researcher": {
         "name": "Gilad Davidson-Rozenfeld",
-        "photo": ""
+        "photo": "https://scholar.googleusercontent.com/citations?view_op=view_photo&user=vh7tqKQAAAAJ"
       }
     },
     {
@@ -790,7 +790,7 @@
       "lab_paper": true,
       "researcher": {
         "name": "Gilad Davidson-Rozenfeld",
-        "photo": ""
+        "photo": "https://scholar.googleusercontent.com/citations?view_op=view_photo&user=vh7tqKQAAAAJ"
       }
     },
     {
@@ -806,7 +806,7 @@
       "lab_paper": true,
       "researcher": {
         "name": "Gilad Davidson-Rozenfeld",
-        "photo": ""
+        "photo": "https://scholar.googleusercontent.com/citations?view_op=view_photo&user=vh7tqKQAAAAJ"
       }
     },
     {
@@ -822,7 +822,7 @@
       "lab_paper": true,
       "researcher": {
         "name": "Gilad Davidson-Rozenfeld",
-        "photo": ""
+        "photo": "https://scholar.googleusercontent.com/citations?view_op=view_photo&user=vh7tqKQAAAAJ"
       }
     },
     {
@@ -838,7 +838,7 @@
       "lab_paper": true,
       "researcher": {
         "name": "Rafi Steckler",
-        "photo": ""
+        "photo": "https://scholar.googleusercontent.com/citations?view_op=view_photo&user=PyKImBwAAAAJ"
       }
     },
     {
@@ -854,7 +854,7 @@
       "lab_paper": true,
       "researcher": {
         "name": "Rafi Steckler",
-        "photo": ""
+        "photo": "https://scholar.googleusercontent.com/citations?view_op=view_photo&user=PyKImBwAAAAJ"
       }
     },
     {
@@ -870,7 +870,7 @@
       "lab_paper": true,
       "researcher": {
         "name": "Rafi Steckler",
-        "photo": ""
+        "photo": "https://scholar.googleusercontent.com/citations?view_op=view_photo&user=PyKImBwAAAAJ"
       }
     },
     {
@@ -886,7 +886,7 @@
       "lab_paper": true,
       "researcher": {
         "name": "Rafi Steckler",
-        "photo": ""
+        "photo": "https://scholar.googleusercontent.com/citations?view_op=view_photo&user=PyKImBwAAAAJ"
       }
     },
     {
