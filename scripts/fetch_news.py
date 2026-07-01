@@ -196,13 +196,14 @@ def extract_date(entry, raw_html: str) -> str:
 # ── Lab researchers ────────────────────────────────────────────────────────
 LAB_YEARS_BACK = 4   # dynamic window: current_year - LAB_YEARS_BACK
 
+_GS = "https://scholar.googleusercontent.com/citations?view_op=view_photo&user="
 RESEARCHERS = [
-    {"name": "Iris Zohar",       "s2_id": "38522818",    "photo": ""},
-    {"name": "Ofir Benjamin",    "s2_id": "72231484",    "photo": ""},
-    {"name": "Adi Jonas-Levi",   "s2_id": "2311554993",  "photo": ""},
+    {"name": "Iris Zohar",       "s2_id": "38522818",    "photo": _GS + "0qOb-iYAAAAJ"},
+    {"name": "Ofir Benjamin",    "s2_id": "72231484",    "photo": _GS + "FsjV0oIAAAAJ"},
+    {"name": "Adi Jonas-Levi",   "s2_id": "2311554993",  "photo": _GS + "oX6_j4gAAAAJ"},
     {"name": "Loai Basheer",     "s2_id": "4157421",     "photo": ""},
-    {"name": "Gilad Davidson-Rozenfeld", "s2_id": "1410646763", "photo": ""},
-    {"name": "Rafi Steckler",    "s2_id": "1403949953",  "photo": ""},
+    {"name": "Gilad Davidson-Rozenfeld", "s2_id": "1410646763", "photo": _GS + "vh7tqKQAAAAJ"},
+    {"name": "Rafi Steckler",    "s2_id": "1403949953",  "photo": _GS + "PyKImBwAAAAJ"},
     {"name": "Giora Rytwo",      "s2_id": "4960911",     "photo": ""},
 ]
 
