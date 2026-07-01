@@ -114,6 +114,41 @@
             object-fit: contain;
         }
 
+        /* ── Photo wrapper (WhatsApp / event photos) ── */
+        .photo-wrap {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            box-shadow: inset 0 0 0 2px rgba(78,201,106,0.22);
+        }
+        .photo-wrap img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            filter: contrast(1.07) saturate(1.13) brightness(0.96);
+            animation: photo-kb 50s ease-in-out both;
+        }
+        .photo-wrap.kb-b img { animation-name: photo-kb-b; }
+        @keyframes photo-kb {
+            from { transform: scale(1.0) translate(0%,    0%); }
+            to   { transform: scale(1.08) translate(-1%, -0.6%); }
+        }
+        @keyframes photo-kb-b {
+            from { transform: scale(1.0)  translate(0%,   0%); }
+            to   { transform: scale(1.08) translate(1%,  0.6%); }
+        }
+        .photo-wrap::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at center,
+                rgba(78,201,106,0.04) 0%,
+                rgba(78,201,106,0.02) 45%,
+                rgba(0,8,4,0.58) 100%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
         /* ── RSS card full-screen slides ── */
         @keyframes bg-breathe {
             0%   { background-position: 0%   0%; }
@@ -952,6 +987,17 @@
             } else if (isVideo(item.src)) {
                 div.setAttribute('data-type', 'video');
                 makeVideoSlide(div, item.src_right || item.src);
+            } else if (item.type === 'image') {
+                var src = item.src_right || item.src;
+                var wrap = document.createElement('div');
+                wrap.className = 'photo-wrap' + (i % 2 === 0 ? '' : ' kb-b');
+                var fgImg = document.createElement('img');
+                fgImg.src = src; fgImg.alt = ''; fgImg.loading = 'eager';
+                wrap.appendChild(fgImg);
+                div.appendChild(wrap);
+                div.setAttribute('data-type', 'image');
+                var dur = (item.duration != null) ? item.duration : CONFIG.imageDuration;
+                div.setAttribute('data-duration', String(dur));
             } else {
                 var src = item.src_right || item.src;
                 var wrap = document.createElement('div');
@@ -962,8 +1008,7 @@
                 wrap.appendChild(fgImg);
                 div.appendChild(wrap);
                 div.setAttribute('data-type', 'image');
-                var dur = (item.duration != null) ? item.duration :
-                          (item.type === 'poster' ? CONFIG.posterDuration : CONFIG.imageDuration);
+                var dur = (item.duration != null) ? item.duration : CONFIG.posterDuration;
                 div.setAttribute('data-duration', String(dur));
             }
 
