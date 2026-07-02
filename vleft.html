@@ -643,18 +643,27 @@
             width: auto;
             object-fit: contain;
         }
-        #weather {
+        #info-right {
             display: flex;
             align-items: center;
-            gap: 0.35em;
-            font-family: Arial, sans-serif;
+            gap: 0.45em;
             color: #2e8b47;
-            font-size: 1.1em;
-            font-weight: bold;
             line-height: 1;
         }
-        #weather-icon { font-size: 1.5em; }
-        #weather-temp { font-variant-numeric: tabular-nums; letter-spacing: 0.03em; }
+        #weather-icon { font-size: 1.4em; }
+        #weather-temp {
+            font-family: 'Orbitron', 'Courier New', monospace;
+            font-size: 1.5em;
+            font-weight: 400;
+            letter-spacing: 0.05em;
+        }
+        #info-sep {
+            color: rgba(46,139,71,0.30);
+            font-family: Arial, sans-serif;
+            font-size: 1.4em;
+            font-weight: 300;
+            line-height: 1;
+        }
     </style>
 </head>
 <body>
@@ -673,12 +682,13 @@
         </div>
         <div id="bottom-bar">
             <img id="logo" src="Logo_official_eng.png" alt="Tel-Hai">
-            <div id="weather">
+            <div id="info-right">
                 <span id="weather-icon">·</span>
                 <span id="weather-temp">--°</span>
-            </div>
-            <div id="clock-digits">
-                <span id="clock-hh">00</span><span id="clock-sep">:</span><span id="clock-mm">00</span>
+                <span id="info-sep">|</span>
+                <div id="clock-digits">
+                    <span id="clock-hh">00</span><span id="clock-sep">:</span><span id="clock-mm">00</span>
+                </div>
             </div>
         </div>
     </div>
